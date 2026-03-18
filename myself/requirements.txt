@@ -1,0 +1,11 @@
+numpy
+pandas
+opencv-python
+cmake
+dlib
+face-recognition
+scikit-learn
+matplotlib
+sqlalchemy
+flask
+flask_sqlalchemy

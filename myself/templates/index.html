@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #6a11cb;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .tab:hover {
+            background-color: #f0f4ff;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+        }
+
+        .content-section {
+            display: none;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f4ff;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #444;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+
+        input:focus, select:focus {
+            border-color: #6a11cb;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(106, 17, 203, 0.2);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-success {
+            background: #28a745;
+        }
+
+        .camera-container {
+            position: relative;
+            width: 100%;
+            max-width: 640px;
+            margin: 20px auto;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #video, #verifyVideo {
+            width: 100%;
+            display: block;
+            background: #000;
+        }
+
+        .camera-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px;
+            color: white;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .capture-count {
+            font-size: 1.2rem;
+            font-weight: bold;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .camera-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .status-message {
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .verification-result {
+            text-align: center;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .verified {
+            background-color: #d4edda;
+            color: #155724;
+            border: 2px solid #28a745;
+        }
+
+        .not-verified {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 2px solid #dc3545;
+        }
+
+        .student-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .student-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .student-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .student-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .student-details {
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .delete-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .delete-btn:hover {
+            background: #c0392b;
+        }
+
+        .attendance-list {
+            margin-top: 20px;
+        }
+
+        .attendance-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid #6a11cb;
+        }
+
+        .attendance-name {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .attendance-details {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .nav-tabs {
+                flex-direction: column;
+            }
+            
+            .student-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Student Management System</h1>
+            <p>Face Recognition Attendance with Live Camera</p>
+        </header>
+
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-number" id="totalStudents">0</div>
+                <div class="stat-label">Total Students</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="attendanceToday">0</div>
+                <div class="stat-label">Attendance Today</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="lecturesToday">0</div>
+                <div class="stat-label">Lectures Today</div>
+            </div>
+        </div>
+
+        <div class="nav-tabs">
+            <div class="tab active" data-tab="verify-student">Quick Verify</div>
+            <div class="tab" data-tab="add-student">Add Student</div>
+            <div class="tab" data-tab="manage-students">Manage Students</div>
+            <div class="tab" data-tab="attendance">Today's Attendance</div>
+            <div class="tab" data-tab="database">Database</div>
+        </div>
+
+        <!-- Quick Verify Section -->
+        <section id="verify-student" class="content-section active">
+            <h2>Quick Face Verification</h2>
+            <p style="text-align: center; margin-bottom: 20px; color: #666;">
+                Look at the camera and click "Verify Face" to mark attendance automatically.
+            </p>
+            
+            <div class="camera-container">
+                <video id="verifyVideo" autoplay playsinline></video>
+                <div class="camera-overlay">
+                    <div>Position your face in the frame and click "Verify Face"</div>
+                </div>
+            </div>
+            
+            <div class="camera-controls">
+                <button id="startVerifyCamera" class="btn">Start Camera</button>
+                <button id="verifyStudentBtn" class="btn btn-success" disabled>Verify Face</button>
+                <button id="stopVerifyCamera" class="btn btn-secondary" disabled>Stop Camera</button>
+            </div>
+            
+            <div id="verificationResult" class="verification-result hidden"></div>
+            <div id="verifyStatus" class="status-message hidden"></div>
+        </section>
+
+        <!-- Add Student Section -->
+        <section id="add-student" class="content-section">
+            <h2>Register New Student</h2>
+            <div class="form-group">
+                <label for="studentName">Full Name</label>
+                <input type="text" id="studentName" placeholder="Enter student's full name">
+            </div>
+            <div class="form-group">
+                <label for="rollNo">Roll Number</label>
+                <input type="text" id="rollNo" placeholder="Enter roll number">
+            </div>
+            <div class="form-group">
+                <label for="department">Department</label>
+                <select id="department">
+                    <option value="">Select Department</option>
+                    <option value="Computer Science">Computer Science</option>
+                    <option value="Electrical Engineering">Electrical Engineering</option>
+                    <option value="Mechanical Engineering">Mechanical Engineering</option>
+                    <option value="Civil Engineering">Civil Engineering</option>
+                    <option value="Business Administration">Business Administration</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="section">Section</label>
+                <input type="text" id="section" placeholder="Enter section (e.g., A, B)">
+            </div>
+            <div class="form-group">
+                <label for="groupName">Group Name</label>
+                <input type="text" id="groupName" placeholder="Enter group name">
+            </div>
+            
+            <div class="camera-container">
+                <video id="video" autoplay playsinline></video>
+                <div class="camera-overlay">
+                    <div class="capture-count">Images Captured: <span id="captureCount">0</span>/5</div>
+                    <div>Position your face in the frame and click "Capture Images"</div>
+                </div>
+            </div>
+            
+            <div class="camera-controls">
+                <button id="startCamera" class="btn">Start Camera</button>
+                <button id="captureImages" class="btn" disabled>Capture Images</button>
+                <button id="stopCamera" class="btn btn-secondary" disabled>Stop Camera</button>
+            </div>
+            
+            <div id="addStudentStatus" class="status-message hidden"></div>
+            
+            <button id="addStudentBtn" class="btn" disabled>Add Student to Database</button>
+        </section>
+
+        <!-- Manage Students Section -->
+        <section id="manage-students" class="content-section">
+            <h2>Manage Students</h2>
+            <div class="form-group">
+                <input type="text" id="searchStudent" placeholder="Search by name or roll number">
+            </div>
+            
+            <div id="studentList" class="student-list">
+                <!-- Student cards will be dynamically added here -->
+            </div>
+            
+            <div id="manageStatus" class="status-message hidden"></div>
+        </section>
+
+        <!-- Today's Attendance Section -->
+        <section id="attendance" class="content-section">
+            <h2>Today's Attendance Records</h2>
+            <button id="refreshAttendance" class="btn">Refresh</button>
+            
+            <div id="attendanceList" class="attendance-list">
+                <!-- Attendance records will be dynamically added here -->
+            </div>
+            
+            <div id="attendanceStatus" class="status-message hidden"></div>
+        </section>
+
+        <!-- Database Section -->
+        <section id="database" class="content-section">
+            <h2>Database Management</h2>
+            <p>Initialize or reset the database. This will delete all existing data.</p>
+            
+            <div class="camera-controls">
+                <button id="initDbBtn" class="btn">Initialize Database</button>
+                <button id="resetDbBtn" class="btn btn-secondary">Reset Database</button>
+            </div>
+            
+            <div id="dbStatus" class="status-message hidden"></div>
+        </section>
+    </div>
+
+    <script>
+        // Tab navigation
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs and sections
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+                
+                // Add active class to clicked tab and corresponding section
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
+                
+                // Load data for specific tabs
+                if (tab.dataset.tab === 'manage-students') {
+                    loadStudents();
+                } else if (tab.dataset.tab === 'attendance') {
+                    loadTodayAttendance();
+                }
+            });
+        });
+
+        // Load statistics
+        async function loadStatistics() {
+            try {
+                const response = await fetch('/api/get_attendance_stats');
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('totalStudents').textContent = data.stats.total_students;
+                    document.getElementById('attendanceToday').textContent = data.stats.attendance_today;
+                    document.getElementById('lecturesToday').textContent = data.stats.total_lectures_today;
+                }
+            } catch (error) {
+                console.error('Error loading statistics:', error);
+            }
+        }
+
+        // Load today's attendance
+        async function loadTodayAttendance() {
+            try {
+                const response = await fetch('/api/get_today_attendance');
+                const data = await response.json();
+                const attendanceList = document.getElementById('attendanceList');
+                
+                if (data.success) {
+                    if (data.attendance.length === 0) {
+                        attendanceList.innerHTML = '<div class="status-message info">No attendance records for today.</div>';
+                    } else {
+                        attendanceList.innerHTML = data.attendance.map(record => `
+                            <div class="attendance-item">
+                                <div class="attendance-name">${record.name} (${record.roll_no})</div>
+                                <div class="attendance-details">
+                                    ${record.department} - ${record.section} | 
+                                    Time: ${record.timestamp.split(' ')[1]}
+                                </div>
+                            </div>
+                        `).join('');
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading attendance:', error);
+            }
+        }
+
+        // Add Student Section Variables
+        const video = document.getElementById('video');
+        const captureCount = document.getElementById('captureCount');
+        const startCameraBtn = document.getElementById('startCamera');
+        const captureImagesBtn = document.getElementById('captureImages');
+        const stopCameraBtn = document.getElementById('stopCamera');
+        const addStudentBtn = document.getElementById('addStudentBtn');
+        const addStudentStatus = document.getElementById('addStudentStatus');
+        
+        let stream = null;
+        let imagesCaptured = 0;
+        const totalImages = 5;
+        let capturedImagesBase64 = [];
+
+        // Verify Student Section Variables
+        const verifyVideo = document.getElementById('verifyVideo');
+        const startVerifyCameraBtn = document.getElementById('startVerifyCamera');
+        const verifyStudentBtn = document.getElementById('verifyStudentBtn');
+        const stopVerifyCameraBtn = document.getElementById('stopVerifyCamera');
+        const verificationResult = document.getElementById('verificationResult');
+        const verifyStatus = document.getElementById('verifyStatus');
+        
+        let verifyStream = null;
+
+        // Start camera for adding student
+        startCameraBtn.addEventListener('click', async () => {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+                startCameraBtn.disabled = true;
+                captureImagesBtn.disabled = false;
+                stopCameraBtn.disabled = false;
+                addStudentStatus.textContent = "Camera started. Position your face and click 'Capture Images'.";
+                addStudentStatus.className = "status-message info";
+                addStudentStatus.classList.remove("hidden");
+            } catch (err) {
+                console.error("Error accessing camera:", err);
+                addStudentStatus.textContent = "Error accessing camera. Please check permissions.";
+                addStudentStatus.className = "status-message error";
+                addStudentStatus.classList.remove("hidden");
+            }
+        });
+
+        // Capture images for student registration
+        captureImagesBtn.addEventListener('click', () => {
+            if (imagesCaptured < totalImages) {
+                // Capture image from video
+                const canvas = document.createElement('canvas');
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(video, 0, 0);
+                const imageData = canvas.toDataURL('image/jpeg');
+                capturedImagesBase64.push(imageData);
+                
+                imagesCaptured++;
+                captureCount.textContent = imagesCaptured;
+                
+                if (imagesCaptured === totalImages) {
+                    captureImagesBtn.disabled = true;
+                    addStudentBtn.disabled = false;
+                    addStudentStatus.textContent = "All images captured! You can now add the student to the database.";
+                    addStudentStatus.className = "status-message success";
+                } else {
+                    addStudentStatus.textContent = `Image ${imagesCaptured} captured. Capture ${totalImages - imagesCaptured} more.`;
+                    addStudentStatus.className = "status-message info";
+                }
+            }
+        });
+
+        // Stop camera for adding student
+        stopCameraBtn.addEventListener('click', () => {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                video.srcObject = null;
+                startCameraBtn.disabled = false;
+                captureImagesBtn.disabled = true;
+                stopCameraBtn.disabled = true;
+                imagesCaptured = 0;
+                capturedImagesBase64 = [];
+                captureCount.textContent = imagesCaptured;
+                addStudentBtn.disabled = true;
+                addStudentStatus.textContent = "Camera stopped.";
+                addStudentStatus.className = "status-message info";
+            }
+        });
+
+        // Add student to database
+        addStudentBtn.addEventListener('click', async () => {
+            const name = document.getElementById('studentName').value;
+            const rollNo = document.getElementById('rollNo').value;
+            const department = document.getElementById('department').value;
+            const section = document.getElementById('section').value;
+            const groupName = document.getElementById('groupName').value;
+            
+            if (!name || !rollNo || !department || !section || !groupName) {
+                addStudentStatus.textContent = "Please fill in all fields.";
+                addStudentStatus.className = "status-message error";
+                return;
+            }
+            
+            if (capturedImagesBase64.length === 0) {
+                addStudentStatus.textContent = "Please capture at least one image.";
+                addStudentStatus.className = "status-message error";
+                return;
+            }
+            
+            // API call to backend
+            addStudentStatus.textContent = "Adding student to database...";
+            addStudentStatus.className = "status-message info";
+            
+            try {
+                const response = await fetch('/api/add_student', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        name: name,
+                        roll_no: rollNo,
+                        department: department,
+                        section: section,
+                        group_name: groupName,
+                        images: capturedImagesBase64
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    addStudentStatus.textContent = data.message;
+                    addStudentStatus.className = "status-message success";
+                    
+                    // Reset form
+                    document.getElementById('studentName').value = '';
+                    document.getElementById('rollNo').value = '';
+                    document.getElementById('department').value = '';
+                    document.getElementById('section').value = '';
+                    document.getElementById('groupName').value = '';
+                    imagesCaptured = 0;
+                    capturedImagesBase64 = [];
+                    captureCount.textContent = imagesCaptured;
+                    addStudentBtn.disabled = true;
+                    
+                    // Stop camera
+                    if (stream) {
+                        stream.getTracks().forEach(track => track.stop());
+                        video.srcObject = null;
+                        startCameraBtn.disabled = false;
+                        captureImagesBtn.disabled = true;
+                        stopCameraBtn.disabled = true;
+                    }
+                    
+                    // Refresh statistics
+                    loadStatistics();
+                } else {
+                    addStudentStatus.textContent = data.message;
+                    addStudentStatus.className = "status-message error";
+                }
+            } catch (error) {
+                console.error('Error adding student:', error);
+                addStudentStatus.textContent = "Error adding student. Please try again.";
+                addStudentStatus.className = "status-message error";
+            }
+        });
+
+        // Start camera for verification
+        startVerifyCameraBtn.addEventListener('click', async () => {
+            try {
+                verifyStream = await navigator.mediaDevices.getUserMedia({ video: true });
+                verifyVideo.srcObject = verifyStream;
+                startVerifyCameraBtn.disabled = true;
+                verifyStudentBtn.disabled = false;
+                stopVerifyCameraBtn.disabled = false;
+                verifyStatus.textContent = "Camera started. Click 'Verify Face' when ready.";
+                verifyStatus.className = "status-message info";
+                verifyStatus.classList.remove("hidden");
+                verificationResult.classList.add("hidden");
+            } catch (err) {
+                console.error("Error accessing camera:", err);
+                verifyStatus.textContent = "Error accessing camera. Please check permissions.";
+                verifyStatus.className = "status-message error";
+                verifyStatus.classList.remove("hidden");
+            }
+        });
+
+        // Verify student and mark attendance
+        verifyStudentBtn.addEventListener('click', async () => {
+            // Capture image from video
+            const canvas = document.createElement('canvas');
+            canvas.width = verifyVideo.videoWidth;
+            canvas.height = verifyVideo.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(verifyVideo, 0, 0);
+            const imageData = canvas.toDataURL('image/jpeg');
+
+            // API call to backend
+            verifyStatus.textContent = "Verifying student...";
+            verifyStatus.className = "status-message info";
+            verificationResult.classList.add("hidden");
+            
+            try {
+                const response = await fetch('/api/verify_student', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        image: imageData
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    if (data.verified) {
+                        verificationResult.textContent = `✓ VERIFIED - ${data.student.name} (${data.student.roll_no}) - ${data.message}`;
+                        verificationResult.className = "verification-result verified";
+                        verifyStatus.textContent = `Similarity: ${data.similarity}% | ${data.message}`;
+                        verifyStatus.className = "status-message success";
+                    } else {
+                        verificationResult.textContent = `✗ NOT VERIFIED - ${data.message}`;
+                        verificationResult.className = "verification-result not-verified";
+                        verifyStatus.textContent = data.message;
+                        verifyStatus.className = "status-message error";
+                    }
+                    
+                    verificationResult.classList.remove("hidden");
+                    
+                    // Refresh statistics and attendance
+                    loadStatistics();
+                    loadTodayAttendance();
+                    
+                    // Auto-stop camera after verification (only if verified)
+                    if (data.verified) {
+                        setTimeout(() => {
+                            if (verifyStream) {
+                                verifyStream.getTracks().forEach(track => track.stop());
+                                verifyVideo.srcObject = null;
+                                startVerifyCameraBtn.disabled = false;
+                                verifyStudentBtn.disabled = true;
+                                stopVerifyCameraBtn.disabled = true;
+                                verifyStatus.textContent = "Camera stopped automatically after verification.";
+                                verifyStatus.className = "status-message info";
+                            }
+                        }, 3000);
+                    }
+                } else {
+                    verifyStatus.textContent = data.message;
+                    verifyStatus.className = "status-message error";
+                }
+            } catch (error) {
+                console.error('Error verifying student:', error);
+                verifyStatus.textContent = "Error verifying student. Please try again.";
+                verifyStatus.className = "status-message error";
+            }
+        });
+
+        // Stop camera for verification
+        stopVerifyCameraBtn.addEventListener('click', () => {
+            if (verifyStream) {
+                verifyStream.getTracks().forEach(track => track.stop());
+                verifyVideo.srcObject = null;
+                startVerifyCameraBtn.disabled = false;
+                verifyStudentBtn.disabled = true;
+                stopVerifyCameraBtn.disabled = true;
+                verifyStatus.textContent = "Camera stopped.";
+                verifyStatus.className = "status-message info";
+                verificationResult.classList.add("hidden");
+            }
+        });
+
+        // Load students for management
+        async function loadStudents() {
+            try {
+                const search = document.getElementById('searchStudent').value;
+                const url = search ? `/api/get_students?search=${encodeURIComponent(search)}` : '/api/get_students';
+                
+                const response = await fetch(url);
+                const data = await response.json();
+                const studentList = document.getElementById('studentList');
+                
+                if (data.success) {
+                    if (data.students.length === 0) {
+                        studentList.innerHTML = '<div class="status-message info">No students found.</div>';
+                    } else {
+                        studentList.innerHTML = data.students.map(student => `
+                            <div class="student-card">
+                                <div class="student-name">${student.name}</div>
+                                <div class="student-details">
+                                    <div><strong>Roll No:</strong> ${student.roll_no}</div>
+                                    <div><strong>Department:</strong> ${student.department}</div>
+                                    <div><strong>Section:</strong> ${student.section}</div>
+                                    <div><strong>Group:</strong> ${student.group_name}</div>
+                                    <div><strong>Added:</strong> ${new Date(student.created_at).toLocaleDateString()}</div>
+                                </div>
+                                <button class="delete-btn" data-id="${student.id}">Delete</button>
+                            </div>
+                        `).join('');
+                        
+                        // Add event listeners to delete buttons
+                        document.querySelectorAll('.delete-btn').forEach(btn => {
+                            btn.addEventListener('click', function() {
+                                const studentId = this.getAttribute('data-id');
+                                deleteStudent(studentId);
+                            });
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading students:', error);
+            }
+        }
+
+        // Delete student
+        async function deleteStudent(studentId) {
+            const manageStatus = document.getElementById('manageStatus');
+            manageStatus.textContent = "Deleting student...";
+            manageStatus.className = "status-message info";
+            manageStatus.classList.remove("hidden");
+            
+            try {
+                const response = await fetch('/api/delete_student', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        student_id: studentId
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    manageStatus.textContent = data.message;
+                    manageStatus.className = "status-message success";
+                    loadStudents();
+                    loadStatistics();
+                } else {
+                    manageStatus.textContent = data.message;
+                    manageStatus.className = "status-message error";
+                }
+            } catch (error) {
+                console.error('Error deleting student:', error);
+                manageStatus.textContent = "Error deleting student. Please try again.";
+                manageStatus.className = "status-message error";
+            }
+        }
+
+        // Search students
+        document.getElementById('searchStudent').addEventListener('input', loadStudents);
+
+        // Initialize database
+        document.getElementById('initDbBtn').addEventListener('click', async () => {
+            const dbStatus = document.getElementById('dbStatus');
+            dbStatus.textContent = "Initializing database...";
+            dbStatus.className = "status-message info";
+            dbStatus.classList.remove("hidden");
+            
+            try {
+                const response = await fetch('/api/init_db', { method: 'POST' });
+                const data = await response.json();
+                
+                if (data.success) {
+                    dbStatus.textContent = data.message;
+                    dbStatus.className = "status-message success";
+                    loadStatistics();
+                    loadStudents();
+                } else {
+                    dbStatus.textContent = data.message;
+                    dbStatus.className = "status-message error";
+                }
+            } catch (error) {
+                console.error('Error initializing database:', error);
+                dbStatus.textContent = "Error initializing database. Please try again.";
+                dbStatus.className = "status-message error";
+            }
+        });
+
+        // Reset database
+        document.getElementById('resetDbBtn').addEventListener('click', async () => {
+            if (confirm("Are you sure you want to reset the database? This will delete all data!")) {
+                const dbStatus = document.getElementById('dbStatus');
+                dbStatus.textContent = "Resetting database...";
+                dbStatus.className = "status-message info";
+                dbStatus.classList.remove("hidden");
+                
+                try {
+                    const response = await fetch('/api/reset_db', { method: 'POST' });
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        dbStatus.textContent = data.message;
+                        dbStatus.className = "status-message success";
+                        loadStatistics();
+                        loadStudents();
+                        loadTodayAttendance();
+                    } else {
+                        dbStatus.textContent = data.message;
+                        dbStatus.className = "status-message error";
+                    }
+                } catch (error) {
+                    console.error('Error resetting database:', error);
+                    dbStatus.textContent = "Error resetting database. Please try again.";
+                    dbStatus.className = "status-message error";
+                }
+            }
+        });
+
+        // Refresh attendance
+        document.getElementById('refreshAttendance').addEventListener('click', loadTodayAttendance);
+
+        // Initialize the application
+        loadStatistics();
+        loadStudents();
+        loadTodayAttendance();
+    </script>
+</body>
+</html>

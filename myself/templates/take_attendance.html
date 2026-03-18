@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Verify Attendance</title>
+  <style>
+    body { font-family: Arial; text-align: center; background: #f2f2f2; margin: 0; }
+    video { border: 2px solid #333; margin-top: 20px; border-radius: 8px; }
+    #match { font-size: 20px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h1>Face Verification in Progress...</h1>
+  <video id="video" width="640" height="480" autoplay></video>
+  <div id="match">Waiting for face...</div>
+
+  <script>
+    const video = document.getElementById('video');
+    const matchDiv = document.getElementById('match');
+
+    async function startCamera() {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      video.srcObject = stream;
+      processFrame();
+    }
+
+    async function processFrame() {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const image = canvas.toDataURL('image/jpeg');
+
+      try {
+        const res = await fetch('/verify-stream', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ image })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          if (data.match_percent) {
+            matchDiv.innerText = `Match: ${data.match_percent}%`;
+          }
+
+          if (data.verified) {
+            matchDiv.innerText = `✅ Verified: ${data.name} (${data.roll_no})`;
+            await new Promise(r => setTimeout(r, 2000));
+            window.location.href = '/'; // redirect to dashboard
+            return;
+          }
+        }
+      } catch (err) {
+        console.error(err);
+      }
+
+      // retry after delay
+      setTimeout(processFrame, 1500);
+    }
+
+    startCamera();
+  </script>
+</body>
+</html>
